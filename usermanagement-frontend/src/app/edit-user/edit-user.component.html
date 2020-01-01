@@ -1,0 +1,22 @@
+<div class="col-md-6">
+  <h2 class="text-center">Edit User</h2>
+  <form>
+
+    <div class="form-group">
+      <label for="firstName">Id:</label>
+      <input [(ngModel)]="user.id" placeholder="Id" name="id" class="form-control" id="id">
+    </div>
+
+    <div class="form-group">
+      <label for="firstName">First Name:</label>
+      <input [(ngModel)]="user.firstName" placeholder="First Name" name="firstName" class="form-control" id="firstName">
+    </div>
+
+    <div class="form-group">
+      <label for="lastName">Last Name:</label>
+      <input [(ngModel)]="user.lastName" placeholder="Last name" name="lastName" class="form-control" id="lastName">
+    </div>
+
+    <button class="btn btn-success" (click)="editUser()">Edit</button>
+  </form>
+</div>
