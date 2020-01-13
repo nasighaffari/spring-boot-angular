@@ -9,7 +9,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 
-@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserManagementApplicationTests {
 
     @Autowired
@@ -24,19 +24,50 @@ class UserManagementApplicationTests {
     }
 
     @Test
-    void testGetAllUsers() {
+    void testCrudOperation() {
+        User user = new User();
+
+        user.setFirstName("Nastaran");
+        user.setLastName("Ghaffari");
+        ResponseEntity<User> createdUser = restTemplate.postForEntity(getBaseUrl(), user, User.class);
+        System.out.println("createdUser1 = " + createdUser.getBody());
+        Assertions.assertNotNull(createdUser.getBody());
+
+        user.setFirstName("Yasaman");
+        user.setLastName("Ghaffari");
+        createdUser = restTemplate.postForEntity(getBaseUrl(), user, User.class);
+        System.out.println("createdUser2 = " + createdUser.getBody());
+        Assertions.assertNotNull(createdUser.getBody());
+        //
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-        ResponseEntity<String> response = restTemplate.exchange(getBaseUrl() + "/users",
-                HttpMethod.GET, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(getBaseUrl(), HttpMethod.GET, entity, String.class);
+        System.out.println("users = " + response.getBody());
         Assertions.assertNotNull(response.getBody());
-    }
-
-    @Test
-    void testGetUserById() {
-        User user = restTemplate.getForObject(getBaseUrl() + "/users/1", User.class);
-        System.out.println(user.getFirstName());
+        //
+        int id = 1;
+        user = restTemplate.getForObject(getBaseUrl() + "/" + id, User.class);
+        System.out.println("beforeUpdateUser User = " + user);
         Assertions.assertNotNull(user);
+
+        user.setFirstName("Nastaran");
+        user.setLastName("Ghaderi");
+        restTemplate.put(getBaseUrl(), user);
+
+        user = restTemplate.getForObject(getBaseUrl() + "/" + id, User.class);
+        System.out.println("afterUpdateUser User = " + user);
+        Assertions.assertNotNull(user);
+        //
+        id = 2;
+        user = restTemplate.getForObject(getBaseUrl() + "/" + id, User.class);
+        System.out.println("beforeDeleteUser User = " + user);
+        Assertions.assertNotNull(user);
+
+        restTemplate.delete(getBaseUrl() + "/" + id);
+        //
+        response = restTemplate.exchange(getBaseUrl(), HttpMethod.GET, entity, String.class);
+        System.out.println("users after update and delete = " + response.getBody());
+        Assertions.assertNotNull(response.getBody());
     }
 
     @Test
@@ -44,33 +75,42 @@ class UserManagementApplicationTests {
         User user = new User();
         user.setFirstName("Nastaran");
         user.setLastName("Ghaffari");
-        ResponseEntity<User> postResponse = restTemplate.postForEntity(getBaseUrl() + "/users", user, User.class);
-        Assertions.assertNotNull(postResponse);
-        Assertions.assertNotNull(postResponse.getBody());
+        ResponseEntity<User> createdUser = restTemplate.postForEntity(getBaseUrl(), user, User.class);
+        Assertions.assertNotNull(createdUser.getBody());
+    }
+
+    @Test
+    void testGetAllUsers() {
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(getBaseUrl(), HttpMethod.GET, entity, String.class);
+        Assertions.assertNotNull(response.getBody());
+    }
+
+    @Test
+    void testGetUserById() {
+        User user = restTemplate.getForObject(getBaseUrl() + "/1", User.class);
+        Assertions.assertNotNull(user);
     }
 
     @Test
     void testUpdateUser() {
         int id = 1;
         User user = restTemplate.getForObject(getBaseUrl() + "/" + id, User.class);
-        user.setFirstName("Yasaman");
-        user.setLastName("Ghaffari");
-        restTemplate.put(getBaseUrl() + "/" + id, user);
-        User updatedUser = restTemplate.getForObject(getBaseUrl() + "/users/" + id, User.class);
-        Assertions.assertNotNull(updatedUser);
+        Assertions.assertNotNull(user);
+
+        user.setFirstName("Nastaran");
+        user.setLastName("Ghaderi");
+        restTemplate.put(getBaseUrl(), user);
     }
 
     @Test
     void testDeleteUser() {
         int id = 2;
-        User user = restTemplate.getForObject(getBaseUrl() + "/users/" + id, User.class);
+        User user = restTemplate.getForObject(getBaseUrl() + "/" + id, User.class);
         Assertions.assertNotNull(user);
-        restTemplate.delete(getBaseUrl() + "/users/" + id);
-        try {
-            user = restTemplate.getForObject(getBaseUrl() + "/users/" + id, User.class);
-        } catch (final HttpClientErrorException e) {
-            Assertions.assertEquals(e.getStatusCode(), HttpStatus.NOT_FOUND);
-        }
+
+        restTemplate.delete(getBaseUrl() + "/" + id);
     }
 
 }
