@@ -13,4 +13,6 @@ The jar file is created in usermanagement-backend/target folder, then run:
 Navigate to below url:
 `http://localhost:8080`
 ## Running unit tests
-`mvn test`
+To test the backend rest calls, run the following command in usermanagement-backend folder:
+`mvn test -Dtest=UserManagementApplicationTests#testCrudOperation`
+The test method creates two users, updates the first, and deletes the second, and finally lists the users.
